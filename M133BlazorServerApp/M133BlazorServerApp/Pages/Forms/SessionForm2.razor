@@ -1,0 +1,95 @@
+﻿@page "/sessionform2"
+@using M133BlazorServerApp.Data
+@using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage
+@inject ProtectedSessionStorage ProtectedSessionStore
+@inject NavigationManager NavigationManager
+
+<style>
+
+
+    article.content.px-4 {
+        background-image: url(../images/gras1.jpeg);
+        background-size: 100%;
+    }
+
+    .form-switch.form-switch-xl .form-check-input {
+        height: 2.5rem;
+        width: calc(4rem + 0.75rem);
+        border-radius: 2.5em;
+        border: 2px solid whitesmoke;
+        background-color: rgba(0, 0, 0, 0.0);
+        margin: auto;
+        position: relative;
+        top: 1px;
+        margin-left: 5px;
+        margin-right: 5px;
+    }
+
+    .form-switch.form-switch-xl .form-check-input:not(checked) {
+            color: rgba(0, 0, 0, 0.0);
+            background-color: white;
+       
+        }
+    .form-switch.form-switch-xl .form-check-input:checked {
+            background-color: rgba(0, 0, 0, 0.0);
+        }
+
+    .form-switch.form-switch-xl {
+        margin: 10px;
+        display: flex;
+        border-radius: 3px;
+        width: auto;
+        font-size: 35px;
+        background-color: rgba(0, 0, 0, 0.5);
+        font-family: 'Poppins', sans-serif;
+        color: whitesmoke;
+        flex-direction: row;
+        padding: 7px;
+        justify-content: space-between;
+    }
+
+</style>
+
+<div class="contentContainer">
+    <h3 class="text-center">Gender</h3>
+    <br />
+    <div class="formContainer">
+        <button class="btn btn-primary" @onclick="PreviousPage"><i class="fa-solid fa-fw fa-arrow-left"></i></button>
+        <div class="form-check form-switch form-switch-xl">
+            <div id="female">Female</div>
+            <input type="checkbox" role="switch" @bind="_model.champGen" class="form-check-input" />
+            <div id="male">Male</div>
+
+        </div>
+        <button class="btn btn-primary" @onclick="NextPage"><i class="fa-solid fa-fw fa-arrow-right"></i></button>
+    </div>
+    <br />
+</div>
+@code {
+
+    SessionFormModel _model = new SessionFormModel();
+
+    protected override async Task OnInitializedAsync()
+    {
+        var result = await ProtectedSessionStore.GetAsync<bool>("Gender");
+        _model.champGen = result.Success && result.Value;
+    }
+    public async Task SaveSession()
+    {
+        await ProtectedSessionStore.SetAsync("Gender", _model.champGen);
+        StateHasChanged();
+    }
+    public async void NextPage()
+    {
+        await SaveSession();
+        NavigationManager.NavigateTo("/sessionform3");
+    }
+    public async void PreviousPage()
+    {
+        await SaveSession();
+        NavigationManager.NavigateTo("/sessionform");
+    }
+
+
+
+}

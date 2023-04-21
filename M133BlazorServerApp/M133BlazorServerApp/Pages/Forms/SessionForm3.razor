@@ -1,0 +1,142 @@
+﻿@page "/sessionform3"
+@using M133BlazorServerApp.Data
+
+@using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage
+@inject ProtectedSessionStorage ProtectedSessionStore
+
+@inject NavigationManager NavigationManager
+@inject IJSRuntime JsRuntime
+
+
+<style>
+
+    
+    button.btn.btn-primary {
+        position: absolute;
+        left: 250px;
+        z-index: 2;
+    }
+
+
+    h3.text-center {
+        font-size: 90px;
+        text-align: center;
+        width: 87%;
+        font-family: 'Poppins', sans-serif;
+        text-shadow: whitesmoke 1px 0 10px;
+        opacity: 0.85;
+        color: whitesmoke;
+        position: absolute;
+        z-index: 100;
+    }
+
+    .champImg {
+        height: 83%;
+        width: 33%;
+        object-fit: cover;
+        transition: all 1.5s ease-in-out;
+        box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
+
+    }
+
+    .champImg:hover {
+        transform: scale(1.08);
+        cursor: pointer;
+        box-shadow: rgba(0, 0, 0, 0.25) 0px 54px 55px, rgba(0, 0, 0, 0.12) 0px -12px 30px, rgba(0, 0, 0, 0.12) 0px 4px 6px, rgba(0, 0, 0, 0.17) 0px 12px 13px, rgba(0, 0, 0, 0.09) 0px -3px 5px;
+    }
+</style>
+
+<input id="file-h" hidden type="text" />
+<input id="file-w" hidden type="text" />
+
+<div class="titleContainer">
+    <button class="btn btn-primary" @onclick="PreviousPage"><i class="fa-solid fa-fw fa-arrow-left"></i></button>
+    <h3 class="text-center">Choose a champion</h3>
+
+</div>
+
+<div id="carousel" class="carousel slide">
+    <div class="carousel-inner">
+        @if (gender.Equals(true))
+        {
+            <div class="carousel-item active">
+                <img src="images/aatrox.jpg" id="aatrox" @onclick='() => SendImage("aatrox")' class="d-block w-100 champImg" alt="...">
+            </div>
+            <div class="carousel-item">
+                <img src="images/renekton.jpg" id="renekton" @onclick='() => SendImage("renekton")' class="d-block w-100 champImg" alt="...">
+            </div>
+            <div class="carousel-item">
+                <img src="images/wukong.jpg" id="wukong" @onclick='() => SendImage("wukong")' class="d-block w-100 champImg" alt="...">
+            </div>
+            <div class="carousel-item">
+                <img src="images/rengar.jpg" id="rengar" @onclick='() => SendImage("rengar")' class="d-block w-100 champImg" alt="...">
+            </div>
+            <div class="carousel-item">
+                <img src="images/aatrox2.jpg" id="aatrox2" @onclick='() => SendImage("aatrox2")' class="d-block w-100 champImg" alt="...">
+            </div>
+        }
+        else
+        {
+            <div class="carousel-item active">
+                <img src="images/akali.jpeg" id="akali" @onclick='() => SendImage("akali")' class="d-block w-100 champImg" alt="...">
+            </div>
+            <div class="carousel-item">
+                <img src="images/gwen.jpeg" id="gwen" @onclick='() => SendImage("gwen")' class="d-block w-100 champImg" alt="...">
+            </div>
+            <div class="carousel-item">
+                <img src="images/leblanc.jpeg" id="leblanc" @onclick='() => SendImage("leblanc")' class="d-block w-100 champImg" alt="...">
+            </div>
+            <div class="carousel-item">
+                <img src="images/samira.jpeg" id="samira" @onclick='() => SendImage("samira")' class="d-block w-100 champImg" alt="...">
+            </div>
+            <div class="carousel-item">
+                <img src="images/riven.jpeg" id="riven" @onclick='() => SendImage("riven")' class="d-block w-100 champImg" alt="...">
+            </div>
+        }
+       
+    </div>
+    <button id="carousel-prev" class="carousel-control-prev" type="button" data-bs-target="#carouselExample" data-bs-slide="prev">
+        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+    </button>
+    <button id="carousel-next" class="carousel-control-next" type="button" data-bs-target="#carouselExample" data-bs-slide="next">
+        <span class="carousel-control-next-icon" aria-hidden="true"></span>
+    </button>
+</div>
+
+
+
+@code {
+
+    bool gender;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var result = await ProtectedSessionStore.GetAsync<bool>("Gender");
+        gender = result.Success && result.Value;
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender) 
+        {
+            await JsRuntime.InvokeAsync<object>("initializeCarousel");
+            firstRender=false;
+        }
+    }
+
+    private async Task SendImage(string id)
+    {
+        await JsRuntime.InvokeVoidAsync("getImage", id);
+        NavigationManager.NavigateTo("/sessionform4");
+    }
+
+
+
+
+    public void PreviousPage()
+    {
+        //SaveSession();
+        NavigationManager.NavigateTo("/sessionform2");
+    }
+
+}

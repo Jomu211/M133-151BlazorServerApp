@@ -1,0 +1,80 @@
+﻿@page "/sessionform4"
+@using M133BlazorServerApp.Data
+
+@using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage
+@inject ProtectedSessionStorage ProtectedSessionStore
+
+@inject NavigationManager NavigationManager
+@inject IJSRuntime JsRuntime
+<style>
+    div.btnContainer {
+        position: absolute;
+        left: 250px;
+    }
+
+
+    .resultText {
+        font-size: 75px;
+        color: whitesmoke;
+        position: absolute;
+        bottom:75px;
+        left: 350px;
+        font-family: 'Rubik Iso', cursive;
+    }
+
+    .resultImg {
+        height: auto;
+        width: 116%;
+        object-fit: cover;
+    }
+</style>
+
+<div class="btnContainer">
+    <button class="btn btn-primary" @onclick="PreviousPage"><i class="fa-solid fa-fw fa-arrow-left"></i></button>
+    <button class="btn btn-primary" @onclick="ClearSession"><i class="fa-solid fa-fw fa-trash-can"></i></button>
+</div>
+
+<img class="resultImg" src="" id="replaceImage" />
+
+    <div class="resultText">@_name</div>
+
+
+
+@code {
+
+    string? _name;
+    SessionFormModel _model = new SessionFormModel();
+
+    protected override void OnAfterRender(bool firstRender)
+    {
+        JsRuntime.InvokeVoidAsync("setImage");
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        var resultName= await ProtectedSessionStore.GetAsync<string>("Name");
+
+        _name = resultName.Success ? resultName.Value : "";
+    }
+
+    public async void ClearSession()
+    {
+        FirstPage();
+        _model = new();
+        await ProtectedSessionStore.DeleteAsync("Name");
+        await ProtectedSessionStore.DeleteAsync("Gender");
+        await ProtectedSessionStore.DeleteAsync("imgData");
+    }
+
+    public void FirstPage()
+    {
+        NavigationManager.NavigateTo("/sessionform");
+    }
+    public void PreviousPage()
+    {
+        NavigationManager.NavigateTo("/sessionform3");
+    }
+
+
+
+}

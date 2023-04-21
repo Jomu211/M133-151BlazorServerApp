@@ -1,0 +1,60 @@
+﻿@page "/loginControlCookie"
+@using System.Web;
+@using M133BlazorServerApp.Pages.CookieLogin
+@using System.Security.Policy
+@inject IJSRuntime JsRuntime
+@inject NavigationManager NavigationManager
+@inject UserAccountService UserAccountService
+
+
+<EditForm Model="model" OnValidSubmit="HandleValid">
+    <input class="form-control loginInput" type="text"
+           placeholder="Username"
+           @bind="@model.Username" id="usernameLoginInput" />
+    <input class="form-control loginInput" type="password"
+           placeholder="Password"
+           @bind="@model.Password" id="passwordLoginInput" />
+    <button type="submit" class="ml-md-auto btn btn-primary">Login</button>
+    <h3 class="wrongLogin">Wrong Login</h3>
+</EditForm>
+
+
+
+@code {
+
+    public class Model
+    {
+        public string Username { get; set; }
+        public string Password { get; set; }
+    }
+
+    private Model model = new();
+
+    private string encode(string param)
+    {
+        return HttpUtility.UrlEncode(param);
+    }
+    //private async Task HandleInvalid()
+    //{
+    //    await JsRuntime.InvokeVoidAsync("handleInvalid");
+    //    await JsRuntime.InvokeVoidAsync("wrongLogin", true);
+
+    //}
+
+    private async Task HandleValid()
+    {
+        await JsRuntime.InvokeVoidAsync("handleInvalid");
+        var userAccount = UserAccountService.GetUserByName(model.Username);
+        if (userAccount == null || userAccount.Password != model.Password)
+        {
+            await JsRuntime.InvokeVoidAsync("wrongLogin", false);
+            return;
+        }
+        NavigationManager.NavigateTo(@$"cookielogin/login?paramUsername={userAccount.Username}&paramPassword={userAccount.Password}?", forceLoad: true);
+    }
+
+}
+
+
+
+@*/cookielogin/login?paramUsername=@encode(model.Username)&paramPassword=@encode(model.Password)*@

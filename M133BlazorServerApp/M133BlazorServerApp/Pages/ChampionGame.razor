@@ -1,0 +1,63 @@
+﻿@page "/championgame"
+@using System.Security.Claims
+@using M133BlazorServerApp.Data
+@using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage
+@using Microsoft.AspNetCore.Authorization
+
+@inject ProtectedSessionStorage ProtectedSessionStore
+@attribute [Authorize]
+@inject NavigationManager NavigationManager
+
+<AuthorizeView>
+    <Authorized>
+        <style>
+            .gameTitle {
+                padding: 20px;
+                margin-bottom: 50px;
+            }
+            .gameGrid {
+                width: auto;
+                display: grid;
+                grid-gap: 20px;
+                grid-template-columns: repeat(5, 100px);
+                grid-template-rows: repeat(5, 100px);
+                grid-auto-flow: column;
+            }
+            .gameContainer {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+
+            }
+            .championBox {
+                background-color: transparent;
+                color: black;
+                box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.3);
+                border-radius: 10px;
+                padding: 20px;
+                font-size: 150%;
+            }
+
+            article.content.px-4 {
+                background-image: url(../images/gras1.jpeg);
+                background-size: 100%;
+            }
+        </style>
+        <div class="gameContainer">
+            <h3 class="text-center gameTitle">Guessing Game</h3>
+            <div class="gameGrid">
+                @for(int i = 0; i < 25; i++)
+                {
+                    <div class="championBox">@i</div>
+                }
+            </div>
+        </div>
+    </Authorized>
+    <NotAuthorized>
+        Guessing Game only for logged in users
+    </NotAuthorized>
+</AuthorizeView>
+
+@code {
+
+}

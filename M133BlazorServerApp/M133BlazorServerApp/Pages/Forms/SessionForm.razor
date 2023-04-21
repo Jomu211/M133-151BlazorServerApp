@@ -1,0 +1,61 @@
+﻿@page "/sessionform"
+@using System.Security.Claims
+@using M133BlazorServerApp.Data
+@using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage
+@using Microsoft.AspNetCore.Authorization
+
+@inject ProtectedSessionStorage ProtectedSessionStore
+@attribute [Authorize]
+@inject NavigationManager NavigationManager
+
+<AuthorizeView>
+    <Authorized>        
+        <style>
+
+            article.content.px-4 {
+                background-image: url(../images/gras1.jpeg);
+                background-size: 100%;
+            }
+        </style>
+        <div class="contentContainer">
+            <h3 class="text-center">Name</h3>
+
+            <br />
+            <div class="formContainer">
+                <input type="text" @bind-value="_model.champName" class="form-control" />
+                <button class="btn btn-primary" @onclick="NextPage"><i class="fa-solid fa-fw fa-arrow-right"></i></button>
+            </div>
+
+            <br />
+        </div>
+    </Authorized>
+    <NotAuthorized>
+        Sessionform only for logged in users
+    </NotAuthorized>
+</AuthorizeView>
+
+@code {
+
+    SessionFormModel _model = new SessionFormModel();
+
+    protected override async Task OnInitializedAsync()
+    {
+        var result = await ProtectedSessionStore.GetAsync<string>("Name");
+        _model.champName = result.Success ? result.Value : "";
+    }
+
+    public async Task SaveSession()
+    {
+        await ProtectedSessionStore.SetAsync("Name", _model.champName);
+    }
+
+    public async void NextPage()
+    {
+        await SaveSession();
+        NavigationManager.NavigateTo("/sessionform2");
+    }
+
+
+
+}
+

@@ -1,0 +1,43 @@
+﻿@page "/"
+@page "/login"
+@inject NavigationManager NavigationManager
+
+
+<style>
+    html body main div.loginNav {
+        display: none !important;
+    }
+
+    article.content.px-4 {
+        background-image: url(../images/gras1.jpeg);
+        background-size: 100%;
+    }
+
+</style>
+<AuthorizeView>
+    <NotAuthorized>
+        <h3 class="text-center loginContainer">Login</h3>
+        <div class="flexContainer">
+            <div class="innerLoginContainer">
+                <h5 class="text-center">Cookie</h5>
+
+                <div class="loginContainer left">
+                    <LoginControlCookie />
+                </div>
+            </div>
+
+            <div class="innerLoginContainer">
+                <h5 class="text-center">Google</h5>
+
+                <div class="loginContainer">
+                    <LoginControlGoogle />
+                </div>
+            </div>
+
+        </div>
+    </NotAuthorized>
+    <Authorized>
+        <h3 class="text-center loginContainer">You're logged in</h3>
+
+    </Authorized>
+</AuthorizeView>

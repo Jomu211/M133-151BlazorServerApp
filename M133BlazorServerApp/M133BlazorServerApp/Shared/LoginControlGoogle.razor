@@ -1,0 +1,26 @@
+﻿@using System.Security.Claims
+@using Microsoft.AspNetCore.Http
+@inject IHttpContextAccessor _httpContextAccessor
+@inject HttpClient Http
+@inject NavigationManager NavigationManager
+
+@if (User.Identity.Name == null)
+{
+    <a class="btn btn-primary" href="/googlelogin/Login" target="_top">Login with <i class="fa-brands fa-google fa-bounce" style="color: whitesmoke;"></i></a>
+}
+@code {
+    private ClaimsPrincipal User;
+
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+        try
+        {
+            User = _httpContextAccessor.HttpContext.User;
+        }
+        catch
+        {
+            // ignored
+        }
+    }
+}
