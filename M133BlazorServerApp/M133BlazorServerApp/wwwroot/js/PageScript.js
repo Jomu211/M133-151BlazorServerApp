@@ -64,3 +64,13 @@ function wrongLogin(invalid) {
         }
     }
 }
+
+
+function flipImage(id) {
+    var el = document.getElementById(id);
+    $(el).find(".championBox").css("-webkit-transform","rotateY(180deg)");
+    $(el).find(".championBox").css("-moz-transform","rotateY(180deg)");
+    $(el).find(".championBox").css("-o-transform","rotateY(180deg)");
+    $(el).find(".championBox").css("transform", "rotateY(180deg)");
+    $(el).find(".front").css("opacity", "0"); 
+}

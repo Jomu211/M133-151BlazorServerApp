@@ -7,35 +7,91 @@
 @inject ProtectedSessionStorage ProtectedSessionStore
 @attribute [Authorize]
 @inject NavigationManager NavigationManager
+@inject IJSRuntime JsRuntime
+
 
 <AuthorizeView>
     <Authorized>
         <style>
-            .gameTitle {
-                padding: 20px;
-                margin-bottom: 50px;
-            }
-            .gameGrid {
-                width: auto;
-                display: grid;
-                grid-gap: 20px;
-                grid-template-columns: repeat(5, 100px);
-                grid-template-rows: repeat(5, 100px);
-                grid-auto-flow: column;
-            }
+            /*      .gameTitle {
+                                        padding: 20px;
+                                        font-size: 75px !important;
+                                    }*/
+
             .gameContainer {
-                display: flex;
-                flex-direction: column;
-                align-items: center;
-                /*test*/
+                height: 100%;
             }
+
+            .gameGrid {
+                display: flex;
+                flex-direction: row;
+                flex-wrap: wrap;
+                align-content: flex-start;
+                justify-content: center;
+                align-items: flex-start;
+            }
+
+            /* .gridContainer {
+                            display: inline-block;
+                            padding-top: 0px !important;
+                            overflow: hidden;
+                            height: 100%;
+                            padding: 20px;
+                        }*/
+
+
             .championBox {
-                background-color: transparent;
-                color: black;
-                box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.3);
+                background-color: #212529;
+                box-shadow: #333 1px 0 10px;
                 border-radius: 10px;
-                padding: 20px;
-                font-size: 150%;
+                padding: 0px;
+                width: 65px;
+                height: 65px;
+                overflow: hidden;
+
+                -webkit-transition: 0.6s;
+                -webkit-transform-style: preserve-3d;
+                -moz-transition: 0.6s;
+                -moz-transform-style: preserve-3d;
+                -o-transition: 0.6s;
+                -o-transform-style: preserve-3d;
+                transition: 0.6s;
+                transform-style: preserve-3d;
+                position: relative;
+            }
+
+            .front {
+                z-index: 2;
+            }
+
+            .back, .front {
+                width: 115%;
+                height: 115%;
+                object-fit: cover;
+                box-shadow: #333 1px 0 10px;
+                position: relative;
+                top: -7.5%;
+                left: -7.5%;
+            }
+
+            .championBoxContainer {
+                -webkit-perspective: 1000;
+                -moz-perspective: 1000;
+                -o-perspective: 1000;
+                perspective: 1000;
+                margin: 8px;
+            }
+
+                .championBoxContainer:hover {
+                    cursor: pointer;
+                }
+
+            .front, .back {
+                -webkit-transition: opacity 0.3s ease-in-out;
+                -moz-transition: opacity 0.3s ease-in-out;
+                -o-transition: opacity 0.3s ease-in-out;
+                transition: opacity 0.3s ease-in-out;
+                position: absolute;
             }
 
             article.content.px-4 {
@@ -44,13 +100,35 @@
             }
         </style>
         <div class="gameContainer">
-            <h3 class="text-center gameTitle">Guessing Game</h3>
+            @*<h3 class="text-center gameTitle">Guessing Game</h3>*@
+            @*<div class="gridContainer">*@
             <div class="gameGrid">
-                @for(int i = 0; i < 25; i++)
-                {
-                    <div class="championBox">@i</div>
+                @{
+                    string rootpath = System.IO.Path.Combine(System.IO.Directory.GetCurrentDirectory(), "wwwroot\\images\\icons");
+                    DirectoryInfo d = new DirectoryInfo(rootpath);
+
+
+
+                    foreach (var file in d.GetFiles("*.png"))
+                    {
+
+                        var src = "images\\icons\\" + file.Name;
+
+                        var output = file.Name.Replace(".png", "");
+
+                        <div id="@output" class="championBoxContainer" @onclick='() => FlipImage(output)'>
+                            <div class="championBox">
+                                <img class="front" src="@src" />
+                                <img class="back" src="images/backSide.png">
+                            </div>
+                        </div>
+
+
+                    }
                 }
             </div>
+            @*</div>*@
+
         </div>
     </Authorized>
     <NotAuthorized>
@@ -59,5 +137,8 @@
 </AuthorizeView>
 
 @code {
-
+    private async Task FlipImage(string id)
+    {
+        await JsRuntime.InvokeVoidAsync("flipImage", id);
+    }
 }
