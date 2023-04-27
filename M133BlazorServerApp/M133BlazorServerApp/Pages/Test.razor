@@ -14,44 +14,6 @@
     <Authorized>
         <style>
 
-            @@media(min-width: 769px) and (max-width: 1399px) {
-
-                body .championBox {
-                    width: 45px;
-                    height: 45px;
-                }
-
-                body .championBoxContainer {
-                    margin: 6px;
-                }
-            }
-
-            @@media(min-width: 1400px) and (max-width: 1600px) {
-
-                body .championBox {
-                    width: 55px;
-                    height: 55px;
-                }
-
-                body .championBoxContainer {
-                    margin: 8px;
-                }
-            }
-
-            @@media(min-width:1601px) {
-                body .championBox {
-                    width: 60px;
-                    height: 60px;
-                }
-
-            }
-            /* gamecontainer scroll und margin*/
-            /*maybe mit prozent arbeiten*/
-
-
-            .gameContainer {
-                height: 100%;
-            }
 
             .gameGrid {
                 display: flex;
@@ -60,15 +22,16 @@
                 align-content: flex-start;
                 justify-content: center;
                 align-items: flex-start;
+                margin:20px;
             }
 
             .championBox {
                 background-color: #212529;
                 box-shadow: #333 1px 0 10px;
                 border-radius: 10px;
-                padding: 0px;
-                width: 65px;
-                height: 65px;
+                margin: 8px;
+                width: calc((3.5vw + 5.5vh) / 2);
+                height: calc((3.5vw + 5.5vh) / 2);
                 overflow: hidden;
                 -webkit-transition: 0.6s;
                 -webkit-transform-style: preserve-3d;
@@ -79,7 +42,15 @@
                 transition: 0.6s;
                 transform-style: preserve-3d;
                 position: relative;
+                -webkit-perspective: 1000;
+                -moz-perspective: 1000;
+                -o-perspective: 1000;
+                perspective: 1000;
             }
+
+                .championBox:hover {
+                    cursor: pointer;
+                }
 
             .front {
                 z-index: 2;
@@ -95,18 +66,6 @@
                 left: -7.5%;
             }
 
-            .championBoxContainer {
-                -webkit-perspective: 1000;
-                -moz-perspective: 1000;
-                -o-perspective: 1000;
-                perspective: 1000;
-                margin: 8px;
-            }
-
-                .championBoxContainer:hover {
-                    cursor: pointer;
-                }
-
             .front, .back {
                 -webkit-transition: opacity 0.3s ease-in-out;
                 -moz-transition: opacity 0.3s ease-in-out;
@@ -120,9 +79,7 @@
                 background-size: 100%;
             }
         </style>
-        <div class="gameContainer">
             @*<h3 class="text-center gameTitle">Guessing Game</h3>*@
-            @*<div class="gridContainer">*@
             <div class="gameGrid">
                 @{
                     string rootpath = System.IO.Path.Combine(System.IO.Directory.GetCurrentDirectory(), "wwwroot\\images\\icons");
@@ -137,20 +94,16 @@
 
                         var output = file.Name.Replace(".png", "");
 
-                        <div id="@output" class="championBoxContainer" @onclick='() => FlipImage(output)'>
-                            <div class="championBox">
-                                <img class="front" src="@src" />
-                                <img class="back" src="images/backSide.png">
-                            </div>
+                        <div id="@output" class="championBox" @onclick='() => FlipImage(output)'>
+                            <img class="front" src="@src" />
+                            <img class="back" src="images/backSide.png">
                         </div>
 
 
                     }
                 }
             </div>
-            @*</div>*@
 
-        </div>
     </Authorized>
     <NotAuthorized>
         Guessing Game only for logged in users
