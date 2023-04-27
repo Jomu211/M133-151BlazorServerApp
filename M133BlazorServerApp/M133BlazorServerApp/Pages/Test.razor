@@ -14,42 +14,106 @@
     <Authorized>
         <style>
 
-            .gameContainer {
-                --w1: 300px;
-                --n: 20;
-                --w2: 200px;
-                --m: 10;
-                --w3: 100px;
-                --p: 0;
-                display: grid;
-                grid-template-columns: repeat(auto-fill, minmax(clamp(clamp(clamp( 100%/(var(--n) + 1) + 0.1%, (var(--w1) - 100vw)*1000, 100%/(var(--m) + 1) + 0.1%), (var(--w2) - 100vw)*1000, 100%/(var(--p) + 1) + 0.1%), (var(--w3) - 100vw)*1000, 100%), 1fr));
-                width: 100%;
-                height: 100%;
-                gap: 10px;
-                padding: 10px;
+            @@media(min-width: 769px) and (max-width: 1399px) {
+
+                body .championBox {
+                    width: 45px;
+                    height: 45px;
+                }
+
+                body .championBoxContainer {
+                    margin: 6px;
+                }
             }
-            .el{
-                height:100%;
-                width:100%;
+
+            @@media(min-width: 1400px) and (max-width: 1600px) {
+
+                body .championBox {
+                    width: 55px;
+                    height: 55px;
+                }
+
+                body .championBoxContainer {
+                    margin: 8px;
+                }
+            }
+
+            @@media(min-width:1601px) {
+                body .championBox {
+                    width: 60px;
+                    height: 60px;
+                }
+
+            }
+            /* gamecontainer scroll und margin*/
+            /*maybe mit prozent arbeiten*/
+
+
+            .gameContainer {
+                height: 100%;
+            }
+
+            .gameGrid {
+                display: flex;
+                flex-direction: row;
+                flex-wrap: wrap;
+                align-content: flex-start;
+                justify-content: center;
+                align-items: flex-start;
+            }
+
+            .championBox {
+                background-color: #212529;
+                box-shadow: #333 1px 0 10px;
+                border-radius: 10px;
+                padding: 0px;
+                width: 65px;
+                height: 65px;
+                overflow: hidden;
+                -webkit-transition: 0.6s;
+                -webkit-transform-style: preserve-3d;
+                -moz-transition: 0.6s;
+                -moz-transform-style: preserve-3d;
+                -o-transition: 0.6s;
+                -o-transform-style: preserve-3d;
+                transition: 0.6s;
+                transform-style: preserve-3d;
+                position: relative;
+            }
+
+            .front {
+                z-index: 2;
+            }
+
+            .back, .front {
+                width: 115%;
+                height: 115%;
+                object-fit: cover;
+                box-shadow: #333 1px 0 10px;
+                position: relative;
+                top: -7.5%;
+                left: -7.5%;
             }
 
             .championBoxContainer {
-                border-radius: 5px;
+                -webkit-perspective: 1000;
+                -moz-perspective: 1000;
+                -o-perspective: 1000;
+                perspective: 1000;
+                margin: 8px;
             }
 
-            /*  .gameGrid {
-                        }
+                .championBoxContainer:hover {
+                    cursor: pointer;
+                }
 
-                        .championBoxContainer {
-                            -webkit-perspective: 1000;
-                            -moz-perspective: 1000;
-                            -o-perspective: 1000;
-                            perspective: 1000;
-                            margin: 8px;
-                        }
-
-            */
-
+            .front, .back {
+                -webkit-transition: opacity 0.3s ease-in-out;
+                -moz-transition: opacity 0.3s ease-in-out;
+                -o-transition: opacity 0.3s ease-in-out;
+                transition: opacity 0.3s ease-in-out;
+                position: absolute;
+            }
 
             article.content.px-4 {
                 background-image: url(../images/gras1.jpeg);
@@ -57,27 +121,35 @@
             }
         </style>
         <div class="gameContainer">
-            @{
-                string rootpath = System.IO.Path.Combine(System.IO.Directory.GetCurrentDirectory(), "wwwroot\\images\\icons");
-                DirectoryInfo d = new DirectoryInfo(rootpath);
+            @*<h3 class="text-center gameTitle">Guessing Game</h3>*@
+            @*<div class="gridContainer">*@
+            <div class="gameGrid">
+                @{
+                    string rootpath = System.IO.Path.Combine(System.IO.Directory.GetCurrentDirectory(), "wwwroot\\images\\icons");
+                    DirectoryInfo d = new DirectoryInfo(rootpath);
 
 
 
-                foreach (var file in d.GetFiles("*.png"))
-                {
+                    foreach (var file in d.GetFiles("*.png"))
+                    {
 
-                    var src = "images\\icons\\" + file.Name;
+                        var src = "images\\icons\\" + file.Name;
 
-                    var output = file.Name.Replace(".png", "");
+                        var output = file.Name.Replace(".png", "");
 
-                    //<div id="@output" class="championBoxContainer" @onclick='() => FlipImage(output)'>
-                        <img class="el" src="@src" />
-                    //</div>
+                        <div id="@output" class="championBoxContainer" @onclick='() => FlipImage(output)'>
+                            <div class="championBox">
+                                <img class="front" src="@src" />
+                                <img class="back" src="images/backSide.png">
+                            </div>
+                        </div>
 
 
+                    }
                 }
-            }
-         
+            </div>
+            @*</div>*@
+
         </div>
     </Authorized>
     <NotAuthorized>
