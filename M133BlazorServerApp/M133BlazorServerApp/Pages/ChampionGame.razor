@@ -1,128 +1,207 @@
 ﻿@page "/championgame"
 @using System.Security.Claims
 @using M133BlazorServerApp.Data
+@using M133BlazorServerApp.M151Data;
 @using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage
 @using Microsoft.AspNetCore.Authorization
+@using Microsoft.EntityFrameworkCore
 
-@inject ProtectedSessionStorage ProtectedSessionStore
+@inject ProtectedLocalStorage ProtectedLocalStorageStore
 @attribute [Authorize]
 @inject NavigationManager NavigationManager
 @inject IJSRuntime JsRuntime
+@inject HttpClient _httpClient
 
+<style>
+
+
+    .gameGrid {
+        display: flex;
+        flex-direction: row;
+        flex-wrap: wrap;
+        align-content: flex-start;
+        justify-content: center;
+        align-items: flex-start;
+        margin: 10px 55px 10px 55px;
+    }
+
+    .championBox {
+        box-shadow: #333 1px 0 10px;
+        border-radius: 10px;
+        margin: 8px;
+        width: calc((4vw + 5.25vh) / 2);
+        height: calc((4vw + 5.25vh) / 2);
+        overflow: hidden;
+        -webkit-transition: 0.6s;
+        -webkit-transform-style: preserve-3d;
+        -moz-transition: 0.6s;
+        -moz-transform-style: preserve-3d;
+        -o-transition: 0.6s;
+        -o-transform-style: preserve-3d;
+        transition: 0.6s;
+        transform-style: preserve-3d;
+        position: relative;
+        -webkit-perspective: 1000;
+        -moz-perspective: 1000;
+        -o-perspective: 1000;
+        perspective: 1000;
+    }
+
+        .championBox:hover {
+            cursor: pointer;
+            filter: brightness(0.85);
+        }
+
+        .championBox:has(.backIsActive):hover {
+            cursor: default;
+            filter: none;
+        }
+
+        .championBox:has(.backIsActive) > .back {
+            opacity: 0.55;
+            background-color: transparent;
+        }
+
+    .front {
+        z-index: 2;
+    }
+
+    .back, .front {
+        width: 115%;
+        height: 115%;
+        object-fit: cover;
+        box-shadow: #333 1px 0 10px;
+        position: relative;
+        top: -7.5%;
+        left: -7.5%;
+    }
+
+    .front, .back {
+        -webkit-transition: opacity 0.3s ease-in-out;
+        -moz-transition: opacity 0.3s ease-in-out;
+        -o-transition: opacity 0.3s ease-in-out;
+        transition: opacity 0.3s ease-in-out;
+        position: absolute;
+    }
+
+    article.content.px-4 {
+        background-image: url(../images/gras1.jpeg);
+        background-size: 100%;
+    }
+
+    h3.text-center {
+        font-size: 70px;
+    }
+
+    div.gameControl {
+        display: flex;
+        flex-direction: row;
+        justify-content: space-evenly;
+        align-items: center;
+        margin: 20px 0px 0px 0px;
+    }
+
+
+
+
+    .parent {
+        display: block;
+        position: relative;
+        float: left;
+        line-height: 30px;
+        background-color: #4FA0D8;
+        border-right: #CCC 1px solid;
+    }
+
+        .parent a {
+            margin: 10px;
+            color: #FFFFFF;
+            text-decoration: none;
+        }
+
+        .parent:hover > ul {
+            display: block;
+            position: absolute;
+        }
+
+    .child {
+        display: none;
+    }
+
+        .child li {
+            background-color: #E4EFF7;
+            line-height: 30px;
+            border-bottom: #CCC 1px solid;
+            border-right: #CCC 1px solid;
+            width: 100%;
+        }
+
+            .child li a {
+                color: #000000;
+            }
+
+    ul {
+        list-style: none;
+        margin: 0;
+        padding: 0px;
+        min-width: 10em;
+    }
+
+        ul ul ul {
+            left: 100%;
+            top: 0;
+            margin-left: 1px;
+        }
+
+    li:hover {
+        background-color: #95B4CA;
+    }
+
+    .parent li:hover {
+        background-color: #F0F0F0;
+    }
+
+    .expand {
+        font-size: 12px;
+        float: right;
+        margin-right: 5px;
+    }
+
+</style>
 
 <AuthorizeView>
     <Authorized>
-        <style>
 
+        <div class="gameControl">
+            <h3 class="text-center">Who am I?</h3>
 
-            .gameGrid {
-                display: flex;
-                flex-direction: row;
-                flex-wrap: wrap;
-                align-content: flex-start;
-                justify-content: center;
-                align-items: flex-start;
-                margin: 20px;
-            }
-
-            .championBox {
-                box-shadow: #333 1px 0 10px;
-                border-radius: 10px;
-                margin: 8px;
-                width: calc((3.5vw + 5.5vh) / 2);
-                height: calc((3.5vw + 5.5vh) / 2);
-                overflow: hidden;
-                -webkit-transition: 0.6s;
-                -webkit-transform-style: preserve-3d;
-                -moz-transition: 0.6s;
-                -moz-transform-style: preserve-3d;
-                -o-transition: 0.6s;
-                -o-transform-style: preserve-3d;
-                transition: 0.6s;
-                transform-style: preserve-3d;
-                position: relative;
-                -webkit-perspective: 1000;
-                -moz-perspective: 1000;
-                -o-perspective: 1000;
-                perspective: 1000;
-            }
-
-                .championBox:hover {
-                    cursor: pointer;
-                    filter: brightness(0.85);
-                }
-
-                .championBox:has(.backIsActive):hover {
-                    cursor: default;
-                    filter: none;
-                }
-
-                .championBox:has(.backIsActive) > .back {
-                    opacity: 0.55;
-                    background-color:transparent;
-                }
-
-            .front {
-                z-index: 2;
-            }
-
-            .back, .front {
-                width: 115%;
-                height: 115%;
-                object-fit: cover;
-                box-shadow: #333 1px 0 10px;
-                position: relative;
-                top: -7.5%;
-                left: -7.5%;
-            }
-
-            .front, .back {
-                -webkit-transition: opacity 0.3s ease-in-out;
-                -moz-transition: opacity 0.3s ease-in-out;
-                -o-transition: opacity 0.3s ease-in-out;
-                transition: opacity 0.3s ease-in-out;
-                position: absolute;
-            }
-
-            article.content.px-4 {
-                background-image: url(../images/gras1.jpeg);
-                background-size: 100%;
-            }
-        </style>
-        @*<h3 class="text-center gameTitle">Guessing Game</h3>*@
-        <div class="gameGrid">
-            @{
-                string rootpath = System.IO.Path.Combine(System.IO.Directory.GetCurrentDirectory(), "wwwroot\\images\\icons");
-                DirectoryInfo d = new DirectoryInfo(rootpath);
-
-
-
-                foreach (var file in d.GetFiles("*.png"))
-                {
-
-                    var src = "images\\icons\\" + file.Name;
-
-                    var output = file.Name.Replace(".png", "");
-
-                    <div id="@output" class="championBox" @onclick='() => FlipImage(output)'>
-                        <img class="front" src="@src" />
-                        <img class="back" src="images/backSide.png">
-                    </div>
-
-
-                }
-            }
+            <a class="btn btn-primary" @onclick="() => StartGame()"><i class="fa-solid fa-fw fa-play" style="color: whitesmoke;"></i> Play </a>
+            <a class="btn btn-primary" @onclick="() => FlipAll()"><i class="fa-solid fa-fw fa-repeat" style="color: whitesmoke;"></i> Flip </a>
         </div>
 
+        <div class="gameGrid">
+            @_renderFragment
+        </div>
     </Authorized>
-    <NotAuthorized>
-        Guessing Game only for logged in users
-    </NotAuthorized>
+
 </AuthorizeView>
 
 @code {
-    private async Task FlipImage(string id)
+
+
+    RenderFragment _renderFragment = null;
+    public async Task StartGame()
     {
-        await JsRuntime.InvokeVoidAsync("flipImage", id);
+        using var response = await _httpClient.GetAsync("https://localhost:7289/GameChampion/Index").ConfigureAwait(false);
+        var content = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
+        _renderFragment = builder =>
+        {
+            builder.AddContent(1, new MarkupString(content));
+        };
+        base.OnInitialized();
+    }
+    public async Task FlipAll()
+    {
+        await JsRuntime.InvokeVoidAsync("flipAll");
     }
 }

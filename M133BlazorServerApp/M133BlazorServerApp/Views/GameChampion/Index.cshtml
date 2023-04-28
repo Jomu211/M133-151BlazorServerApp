@@ -1,0 +1,88 @@
+﻿@model IEnumerable<M133BlazorServerApp.M151Data.GameChampion>
+
+<style type="text/css">
+
+
+</style>
+
+
+
+@foreach (var champion in Model)
+{
+    <div id="@champion.ChampionName" class="championBox" data-champid="@champion.ChampionName">
+        <img class="front" src="@champion.ImageUrl" />
+        <img class="back" src="images/backSide.png">
+
+    </div>
+}
+
+<ul id="menu">
+    @*DBHead noch nicht ganz richtig*@
+    <li class="parent">
+        <a href="#">Attributes</a>
+        <ul class="child">
+            <li class="parent">
+
+                <a href="#">@Html.DisplayNameFor(model => model.Geschlecht) <span class="expand">></span></a>
+                <ul class="child">
+                    @foreach (var el in Model.GroupBy(t => t.Geschlecht).ToList())
+                    {
+                        <li><a href="#">@el.Key</a></li>
+                    }
+                </ul>
+            </li>
+            <li class="parent">
+                <a href="#">@Html.DisplayNameFor(model => model.Region) <span class="expand">></span></a>
+                <ul class="child">
+                    @foreach (var el in Model.GroupBy(t => t.Region).ToList())
+                    {
+                        <li><a href="#">@el.Key</a></li>
+                    }
+                </ul>
+            </li>
+            <li class="parent">
+                <a href="#">@Html.DisplayNameFor(model => model.Head) <span class="expand">></span></a>
+                <ul class="child">
+                    <li class="parent">
+                        <a href="#">@Html.DisplayNameFor(model => model.Head.Haaresfarbe) <span class="expand">></span></a>
+                        <ul class="child">
+                            @foreach (var el in Model.GroupBy(t => t.Head).ToList())
+                            {
+                                <li><a href="#">@el.Key</a></li>
+                            }
+                        </ul>
+                    </li>
+                    <li class="parent">
+                        <a href="#">@Html.DisplayNameFor(model => model.Head.Kopfbedeckung) <span class="expand">></span></a>
+                        <ul class="child">
+                            @foreach (var el in Model.GroupBy(t => t.Head).ToList())
+                            {
+                                <li><a href="#">@el.Key</a></li>
+                            }
+                        </ul>
+                    </li>
+                    <li class="parent">
+                        <a href="#">@Html.DisplayNameFor(model => model.Head.Anderes) <span class="expand">></span></a>
+                        <ul class="child">
+                            @foreach (var el in Model.GroupBy(t => t.Head).ToList())
+                            {
+                                <li><a href="#">@el.Key</a></li>
+                            }
+                        </ul>
+                    </li>
+                </ul>
+            </li>
+            <li class="parent">
+               
+               
+                <a href="#">@Html.DisplayNameFor(model => model.Kampfart) <span class="expand">></span></a>
+                <ul class="child">
+                    @foreach (var el in Model.GroupBy(t => t.Kampfart).ToList())
+                    {
+                        <li><a href="#">@el.Key</a></li>
+                    }
+                </ul>
+            </li>
+        </ul>
+    </li>
+</ul>

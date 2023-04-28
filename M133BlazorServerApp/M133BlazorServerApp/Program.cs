@@ -8,26 +8,31 @@ using System.Security.Claims;
 using M133BlazorServerApp.Pages.CookieLogin;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using System;
+using M133BlazorServerApp.M151Data;
+using Microsoft.EntityFrameworkCore;
+using M133BlazorServerApp;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddAuthenticationCore();
-builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
+builder.Services.AddRazorPages();
+
+builder.Services.AddControllersWithViews();
 
 builder.Services.AddScoped<ProtectedSessionStorage>();
-
 builder.Services.AddScoped<System.Net.Http.HttpClient>();
 
 builder.Services.AddSingleton<UserAccountService>();
-
 builder.Services.AddSingleton<WeatherForecastService>();
-builder.Services.AddDistributedMemoryCache(); 
+builder.Services.AddDistributedMemoryCache();
 
 var services = builder.Services;
 var config = builder.Configuration;
 
 
+#region Auth
 services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme).AddCookie();
 services.AddAuthentication().AddGoogle(options =>
 {
@@ -41,35 +46,38 @@ services.AddScoped<HttpContextAccessor>();
 services.AddHttpClient();
 services.AddScoped<HttpClient>();
 services.AddSingleton<IConfiguration>(config);
+#endregion
 
+Microsoft.Extensions.Configuration.ConfigurationManager configuration = builder.Configuration;
+configuration.GetSection("AppOptions").Bind(M133BlazorServerApp.ApplicationSettings.AppOptions);
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Error");
-    // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     app.UseHsts();
 }
 
 
 app.UseHttpsRedirection();
-
 app.UseStaticFiles();
-app.UseCookiePolicy();
-
 app.UseRouting();
+app.UseCors();
+
+app.UseCookiePolicy();
 app.UseAuthentication();
 app.UseAuthorization();
 
 app.UseEndpoints(endpoints =>
 {
-    endpoints.MapRazorPages();
     endpoints.MapControllers();
+    endpoints.MapRazorPages();
     endpoints.MapBlazorHub();
     endpoints.MapFallbackToPage("/_Host");
 
 });
 
+
 app.Run();
+

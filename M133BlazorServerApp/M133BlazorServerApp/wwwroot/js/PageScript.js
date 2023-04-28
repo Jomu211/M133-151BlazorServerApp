@@ -66,12 +66,26 @@ function wrongLogin(invalid) {
 }
 
 
-function flipImage(id) {
-    var el = document.getElementById(id);
-    $(el).css("-webkit-transform","rotateY(180deg)");
-    $(el).css("-moz-transform","rotateY(180deg)");
-    $(el).css("-o-transform","rotateY(180deg)");
-    $(el).css("transform", "rotateY(180deg)");
-    $(el).find(".front").css("opacity", "0"); 
-    $(el).find(".back").addClass("backIsActive");
+$(document).ready(function () {
+    $("body").on("click", ".championBox", function () {
+        var id = $(this).data("champid");
+        var el = document.getElementById(id);
+        $(el).css("-webkit-transform", "rotateY(180deg)");
+        $(el).css("-moz-transform", "rotateY(180deg)");
+        $(el).css("-o-transform", "rotateY(180deg)");
+        $(el).css("transform", "rotateY(180deg)");
+        $(el).find(".front").css("opacity", "0");
+        $(el).find(".back").addClass("backIsActive");
+    });
+
+});
+
+function flipAll() {
+    $(".championBox").css("-webkit-transform", "rotateY(0deg)");
+    $(".championBox").css("-moz-transform", "rotateY(0deg)");
+    $(".championBox").css("-o-transform", "rotateY(0deg)");
+    $(".championBox").css("transform", "rotateY(0deg)");
+    $(".championBox").find(".front").css("opacity", "1");
+    $(".championBox").find(".back").removeClass("backIsActive");
+
 }
