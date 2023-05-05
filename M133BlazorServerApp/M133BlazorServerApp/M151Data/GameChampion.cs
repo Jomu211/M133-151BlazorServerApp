@@ -17,6 +17,7 @@ namespace M133BlazorServerApp.M151Data
         [Display(Name = "Combat Style")]
         public string? Kampfart { get; set; }
         public bool ChosenChampion { get; set; }
+        public bool Hidden { get; set; }
         public virtual Head Head { get; set; }
     }
 }

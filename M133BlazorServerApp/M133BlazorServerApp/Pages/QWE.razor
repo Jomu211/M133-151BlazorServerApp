@@ -1,0 +1,29 @@
+﻿@page "/qwe"
+
+@using M133BlazorServerApp.Data
+@using M133BlazorServerApp.M151Data;
+
+<h3>@message</h3>
+@foreach (var test in champions)
+{
+    <div>@test.ChampionName</div>
+}
+@foreach(var test2 in db.GameChampions)
+{
+    <div>@test2.ChampionName</div>
+    <div>@test2.Head.Haaresfarbe</div>
+
+}
+
+@code {
+    private string? message;
+    private List<GameChampion> champions;
+    private M151DbContext db = new M151DbContext();
+
+    protected override void OnInitialized()
+    {
+
+        champions = db.GameChampions.ToList();
+
+    }
+}

@@ -10,8 +10,7 @@ namespace M133BlazorServerApp.M151Data
         public DbSet<Head> Head { get; set; }
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            optionsBuilder.UseSqlServer(ApplicationSettings.AppOptions.DatabaseConnectionString);
-
+            optionsBuilder.UseLazyLoadingProxies().UseSqlServer(ApplicationSettings.AppOptions.DatabaseConnectionString); 
         }
     }
 }

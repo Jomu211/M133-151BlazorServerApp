@@ -6,6 +6,7 @@
 @using Microsoft.AspNetCore.Authorization
 @using Microsoft.EntityFrameworkCore
 
+@*@inject Controllers.GameChampionController GameChampionController*@
 @inject ProtectedLocalStorage ProtectedLocalStorageStore
 @attribute [Authorize]
 @inject NavigationManager NavigationManager
@@ -47,10 +48,6 @@
         perspective: 1000;
     }
 
-        .championBox:hover {
-            cursor: pointer;
-            filter: brightness(0.85);
-        }
 
         .championBox:has(.backIsActive):hover {
             cursor: default;
@@ -77,10 +74,10 @@
     }
 
     .front, .back {
-        -webkit-transition: opacity 0.3s ease-in-out;
-        -moz-transition: opacity 0.3s ease-in-out;
-        -o-transition: opacity 0.3s ease-in-out;
-        transition: opacity 0.3s ease-in-out;
+        -webkit-transition: all 0.3s ease-in-out;
+        -moz-transition: all 0.3s ease-in-out;
+        -o-transition: all 0.3s ease-in-out;
+        transition: all 0.3s ease-in-out;
         position: absolute;
     }
 
@@ -167,6 +164,37 @@
         margin-right: 5px;
     }
 
+    .frontAnim {
+        animation: wiggle 0.5s;
+        animation-iteration-count: infinite;
+    }
+
+        .frontAnim:hover {
+            cursor: pointer;
+            filter: brightness(0.85);
+        }
+
+    @@keyframes wiggle {
+        0% {
+            transform: rotate(0deg);
+        }
+
+        25% {
+            transform: rotate(5deg);
+        }
+
+        50% {
+            transform: rotate(0eg);
+        }
+
+        75% {
+            transform: rotate(-5deg);
+        }
+
+        100% {
+            transform: rotate(0deg);
+        }
+    }
 </style>
 
 <AuthorizeView>
@@ -175,33 +203,221 @@
         <div class="gameControl">
             <h3 class="text-center">Who am I?</h3>
 
-            <a class="btn btn-primary" @onclick="() => StartGame()"><i class="fa-solid fa-fw fa-play" style="color: whitesmoke;"></i> Play </a>
-            <a class="btn btn-primary" @onclick="() => FlipAll()"><i class="fa-solid fa-fw fa-repeat" style="color: whitesmoke;"></i> Flip </a>
+            @*<a class="btn btn-primary" @onclick="() => StartGame()"><i class="fa-solid fa-fw fa-play" style="color: whitesmoke;"></i> Play </a>*@
+            <a class="btn btn-primary" @onclick="() => ShowAllChampion()"><i class="fa-solid fa-fw fa-repeat" style="color: whitesmoke;"></i> Restart </a>
+            <ul id="menu">
+                <li class="parent">
+                    <a href="#">Attributes</a>
+                    <ul class="child">
+                        <li class="parent">
+
+                            <a href="#">Gender <span class="expand">></span></a>
+                            <ul class="child">
+                                @foreach (var el in Champions.GroupBy(t => t.Geschlecht).ToList())
+                                {
+                                    <li><a class="attributeLink" @onclick='() => SearchAttribute(el.Key, "Geschlecht")'>@el.Key</a></li>
+                                }
+                            </ul>
+                        </li>
+                        <li class="parent">
+                            <a href="#">Region <span class="expand">></span></a>
+                            <ul class="child">
+                                @foreach (var el in Champions.GroupBy(t => t.Region).ToList())
+                                {
+                                    <li><a class="attributeLink" @onclick='() => SearchAttribute(el.Key, "Region")'>@el.Key</a></li>
+                                }
+                            </ul>
+                        </li>
+                        <li class="parent">
+                            <a href="#">Head <span class="expand">></span></a>
+                            <ul class="child">
+                                <li class="parent">
+                                    <a href="#">Hair color <span class="expand">></span></a>
+                                    <ul class="child">
+                                        @foreach (var el in Champions.GroupBy(t => t.Head.Haaresfarbe).ToList())
+                                        {
+                                            if (el.Key != null)
+                                            {
+                                                <li><a class="attributeLink" @onclick='() => SearchAttribute(el.Key, "Haaresfarbe")'>@el.Key</a></li>
+                                            }
+                                        }
+                                    </ul>
+                                </li>
+                                <li class="parent">
+                                    <a href="#">Headgear <span class="expand">></span></a>
+                                    <ul class="child">
+                                        @foreach (var el in Champions.GroupBy(t => t.Head.Kopfbedeckung).ToList())
+                                        {
+                                            if (el.Key != null)
+                                            {
+                                                <li><a class="attributeLink" @onclick='() => SearchAttribute(el.Key, "Kopfbedeckung")'>@el.Key</a></li>
+                                            }
+                                        }
+                                    </ul>
+                                </li>
+                                <li class="parent">
+                                    <a href="#">Other <span class="expand">></span></a>
+                                    <ul class="child">
+                                        @foreach (var el in Champions.GroupBy(t => t.Head.Anderes).ToList())
+                                        {
+                                            if (el.Key != null)
+                                            {
+                                                <li><a class="attributeLink" @onclick='() => SearchAttribute(el.Key, "Anderes")'>@el.Key</a></li>
+                                            }
+                                        }
+                                    </ul>
+                                </li>
+                            </ul>
+                        </li>
+                        <li class="parent">
+
+
+                            <a href="#">Combat style <span class="expand">></span></a>
+                            <ul class="child">
+                                @foreach (var el in Champions.GroupBy(t => t.Kampfart).ToList())
+                                {
+                                    <li><a class="attributeLink" @onclick='() => SearchAttribute(el.Key, "Kampfart")'>@el.Key</a></li>
+                                }
+                            </ul>
+                        </li>
+                    </ul>
+                </li>
+            </ul>
+
         </div>
 
         <div class="gameGrid">
-            @_renderFragment
+            @foreach (var champion in Champions)
+            {
+                <div id="@champion.ChampionName" class="championBox" data-champid="@champion.ChampionName">
+                    <img class="front" src="@champion.ImageUrl" />
+                    <img class="back" src="images/backSide.png">
+                </div>
+            }
         </div>
     </Authorized>
 
 </AuthorizeView>
 
 @code {
-
-
+    bool firstLoad = true;
     RenderFragment _renderFragment = null;
-    public async Task StartGame()
+    //public async Task StartGame()
+    //{
+    //    using var response = await _httpClient.GetAsync("https://localhost:7289/GameChampion/ChampionPartial").ConfigureAwait(false);
+    //    var content = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
+    //    _renderFragment = builder =>
+    //    {
+    //        builder.AddContent(1, new MarkupString(content));
+    //    };
+    //    base.OnInitialized();
+    //    firstLoad = false;
+    //}
+
+    //List<GameChampion> GameChampions;
+
+
+
+    public List<GameChampion> Champions;
+    public M151DbContext db = new M151DbContext();
+
+    protected override void OnInitialized()
     {
-        using var response = await _httpClient.GetAsync("https://localhost:7289/GameChampion/Index").ConfigureAwait(false);
-        var content = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
-        _renderFragment = builder =>
-        {
-            builder.AddContent(1, new MarkupString(content));
-        };
-        base.OnInitialized();
+        Champions = db.GameChampions.Include(t => t.Head).ToList();
+
     }
-    public async Task FlipAll()
+
+    protected override async Task OnInitializedAsync()
     {
+        //GameChampions = await Task.Run(() => GameChampionController.GetAllEmployeesAsync());
+
+
+        //if (firstLoad)
+        //{
+        //    await StartGame();
+        //}
+
+    }
+    protected override void OnAfterRender(bool firstRender)
+    {
+        if (firstRender)
+        {
+            foreach (var champ in Champions.Where(x => x.Hidden == true))
+            {
+                JsRuntime.InvokeVoidAsync("flipAnim", champ.ChampionName);
+            }
+        }
+
+    }
+
+
+
+    public GameChampion FindChosenChampion()
+    {
+        return Champions.Where(x => x.ChosenChampion == true).FirstOrDefault();
+    }
+
+    public async Task SearchAttribute(string key, string column)
+    {
+        var chosen = FindChosenChampion();
+        var chosenCol = chosen.GetType().GetProperty(column);
+
+
+        if (chosenCol == null)
+        {
+            chosenCol = chosen.Head.GetType().GetProperty(column);
+            if(chosenCol == null)
+            {
+                await JsRuntime.InvokeVoidAsync("alert", "Error, Something went wrong.");
+                return;
+            }
+        }
+
+        var chosenValue = chosenCol.GetValue(chosen).ToString();
+        if (chosenValue != key)
+        {
+            await JsRuntime.InvokeVoidAsync("alert", "The champion you're looking for does not have this attribute");
+            return;
+        }
+
+        foreach (var champ in Champions)
+        {
+            var col = champ.GetType().GetProperty(column);
+            if (col != null)
+            {
+                var value = col.GetValue(champ).ToString();
+                if (value != key)
+                {
+                    if (champ.Hidden == false)
+                    {
+                        await JsRuntime.InvokeVoidAsync("flipClickable", champ.ChampionName);
+                        HideChampion(champ.Id);
+                    }
+
+                }
+            }
+        }
+    }
+
+    public void HideChampion(int id)
+    {
+        var champ = db.GameChampions.Where(x => x.Id == id).FirstOrDefault();
+        champ.Hidden = true;
+        db.Entry(champ).State = EntityState.Modified;
+        db.SaveChanges();
+    }
+
+
+
+    public async Task ShowAllChampion()
+    {
+        foreach (var champ in Champions)
+        {
+            champ.Hidden = false;
+            db.Entry(champ).State = EntityState.Modified;
+        }
+        db.SaveChanges();
         await JsRuntime.InvokeVoidAsync("flipAll");
+
     }
 }

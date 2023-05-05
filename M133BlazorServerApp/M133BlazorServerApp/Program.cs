@@ -12,6 +12,7 @@ using System;
 using M133BlazorServerApp.M151Data;
 using Microsoft.EntityFrameworkCore;
 using M133BlazorServerApp;
+using M133BlazorServerApp.Controllers;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -19,8 +20,8 @@ builder.Services.AddAuthenticationCore();
 builder.Services.AddServerSideBlazor();
 builder.Services.AddRazorPages();
 
-builder.Services.AddControllersWithViews();
-
+builder.Services.AddControllersWithViews().AddRazorRuntimeCompilation();
+builder.Services.AddScoped<GameChampionController>();
 builder.Services.AddScoped<ProtectedSessionStorage>();
 builder.Services.AddScoped<System.Net.Http.HttpClient>();
 
